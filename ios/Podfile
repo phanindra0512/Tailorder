@@ -1,0 +1,51 @@
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '10.0'
+
+target 'Tailorder' do
+  config = use_native_modules!
+
+  use_react_native!(:path => config["reactNativePath"])
+
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
+  pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
+
+  pod 'react-native-sms', :path => '../node_modules/react-native-sms'
+
+  pod 'lottie-react-native', :path => '../node_modules/lottie-react-native'
+
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
+  pod 'react-native-date-picker', :path => '../node_modules/react-native-date-picker'
+
+  pod 'react-native-cameraroll', :path => '../node_modules/@react-native-community/cameraroll'
+
+  pod 'react-native-view-shot', :path => '../node_modules/react-native-view-shot'
+
+  pod 'react-native-direct-sms', :path => '../node_modules/react-native-direct-sms'
+
+  target 'TailorderTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  # Enables Flipper.
+  #
+  # Note that if you have use_frameworks! enabled, Flipper will not work and
+  # you should disable these next few lines.
+  use_flipper!
+  post_install do |installer|
+    flipper_post_install(installer)
+  end
+end
+
+target 'Tailorder-tvOS' do
+  # Pods for Tailorder-tvOS
+
+  target 'Tailorder-tvOSTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+end
