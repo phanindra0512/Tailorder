@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { Searchbar, Divider, ActivityIndicator } from 'react-native-paper';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -9,104 +9,6 @@ import firestore from '@react-native-firebase/firestore';
 
 import styles from './styles';
 import CustomHeader from '../../../components/CustomHeader';
-
-const myOrders = [
-	{
-		custName: 'U.Sai Phanindra',
-		OrderId: 'A501',
-		total: 1200,
-		items: [
-			{
-				itemName: 'Shirts',
-				itemCount: 2
-			},
-			{
-				itemName: 'Pants',
-				itemCount: 2
-			},
-			{
-				itemName: 'Suit',
-				itemCount: 1
-			}
-		],
-		orderDate: '24/04/2021',
-		deliveryDate: '30/04/2021',
-		orderStatus: 'PLACED'
-	},
-	{
-		custName: 'T.Himavants',
-		OrderId: 'A502',
-		total: 1500,
-		items: [
-			{
-				itemName: 'Shirts',
-				itemCount: 1
-			},
-
-			{
-				itemName: 'Suit',
-				itemCount: 1
-			}
-		],
-		orderDate: '25/04/2021',
-		deliveryDate: '31/04/2021',
-		orderStatus: 'PLACED'
-	},
-	{
-		custName: 'D.sai',
-		OrderId: 'A503',
-		total: 1350,
-		items: [
-			{
-				itemName: 'Shirts',
-				itemCount: 2
-			},
-			{
-				itemName: 'Pants',
-				itemCount: 2
-			}
-		],
-		orderDate: '27/04/2021',
-		deliveryDate: '30/04/2021',
-		orderStatus: 'PLACED'
-	},
-	{
-		custName: 'D.sai',
-		OrderId: 'A503',
-		total: 1350,
-		items: [
-			{
-				itemName: 'Shirts',
-				itemCount: 2
-			},
-			{
-				itemName: 'Pants',
-				itemCount: 2
-			}
-		],
-		orderDate: '27/04/2021',
-		deliveryDate: '30/04/2021',
-		orderStatus: 'PLACED'
-	},
-	{
-		custName: 'D.sai',
-		OrderId: 'A503',
-		total: 1350,
-		items: [
-			{
-				itemName: 'Shirts',
-				itemCount: 2
-			},
-			{
-				itemName: 'Pants',
-				itemCount: 2
-			}
-		],
-		orderDate: '27/04/2021',
-		deliveryDate: '30/04/2021',
-		orderStatus: 'PLACED'
-	}
-];
 
 function ViewOrders({ navigation }) {
 	const [ isLoader, setLoader ] = useState(false);
@@ -118,6 +20,8 @@ function ViewOrders({ navigation }) {
 
 	const [ isOrders, setIsOrders ] = useState([]);
 	const [ isSearchOrders, setIsSearchOrders ] = useState([]);
+
+	const [ refreshing, setRefreshing ] = useState(false);
 
 	useEffect(() => {
 		const todayOrders = async () => {
@@ -131,11 +35,32 @@ function ViewOrders({ navigation }) {
 			const orders = data.reverse();
 			setIsOrders(orders);
 			setIsSearchOrders(orders);
-			// console.log('view orders ---->', data);
+			// console.log('refresh orders ---->', orders);
+
 			setLoader(false);
 		};
 		todayOrders();
 	}, []);
+
+	const onRefresh = () => {
+		setRefreshing(true);
+		const todayOrders = async () => {
+			setLoader(true);
+
+			const user = await firestore().collection('MyOrders').get();
+
+			//here i m getting data will be in separate obj and id's will be separate obj,
+			// we will combine that using assign method below
+			const data = user._docs.map((docs) => docs._data);
+			const orders = data.reverse();
+			setIsOrders(orders);
+			setIsSearchOrders(orders);
+			console.log('refresh orders ---->', data);
+			setRefreshing(false);
+			setLoader(false);
+		};
+		todayOrders();
+	};
 
 	const onChangeSearch = (text) => {
 		setIsSearchOrders(isOrders.filter((i) => i.orderDetails.custId.toLowerCase().includes(text.toLowerCase())));
@@ -175,7 +100,10 @@ function ViewOrders({ navigation }) {
 				</View>
 			) : (
 				<View style={{ flex: 1 }}>
-					<ScrollView style={{ flex: 1 }}>
+					<ScrollView
+						style={{ flex: 1 }}
+						refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+					>
 						<View>
 							<Searchbar
 								placeholder="Search By Order ID"

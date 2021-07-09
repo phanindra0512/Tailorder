@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, RefreshControl } from 'react-native';
 import { Divider, RadioButton, FAB, ActivityIndicator } from 'react-native-paper';
 import { Button, Overlay } from 'react-native-elements';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
@@ -58,6 +58,8 @@ function OrderDetails({ route, navigation }) {
 	const [ isClothDetail, setClothDetail ] = useState([]);
 	const [ isMeasurDetail, setMeasurDetail ] = useState([]);
 
+	const [ refreshing, setRefreshing ] = useState(false);
+
 	useEffect(() => {
 		console.log('id', route.params.orderId);
 
@@ -100,6 +102,51 @@ function OrderDetails({ route, navigation }) {
 
 		getData();
 	}, []);
+
+	const onRefresh = () => {
+		setRefreshing(true);
+
+		const getRefreshData = async () => {
+			setLoader(true);
+
+			const user = await firestore().collection('MyOrders').doc(route.params.orderId).get();
+
+			console.log('order data---->', user._data.orderDetails);
+			setOrderDetail(user._data.orderDetails);
+
+			console.log('item details---->', user._data.orderDetails.itemDetails);
+			setItemDetail(user._data.orderDetails.itemDetails);
+
+			console.log('mesurment Details ---->', user._data.orderDetails.mesurmentDetails);
+			setMeasurDetail(user._data.orderDetails.mesurmentDetails);
+
+			console.log('clothes Details---->', user._data.orderDetails.clothesDetails);
+			setClothDetail(user._data.orderDetails.clothesDetails);
+
+			showStatus(user._data.orderDetails.orderStatus);
+			console.log('status', user._data.orderDetails.orderStatus);
+			setRefreshing(false);
+			setLoader(false);
+		};
+
+		const showStatus = (status) => {
+			console.log('get', status);
+			if (status == 'PLACED') {
+				setStatus(1);
+			} else if (status == 'CUTTING') {
+				setStatus(2);
+			} else if (status == 'STICHING') {
+				setStatus(3);
+			} else if (status == 'READY') {
+				setStatus(4);
+			} else if (status == 'DELIVERY') {
+				setStatus(5);
+			} else if (status == 'DELIVERIED') {
+				setStatus(5);
+			}
+		};
+		getRefreshData();
+	};
 
 	const completePayment = async () => {
 		const user = await firestore()
@@ -191,7 +238,7 @@ function OrderDetails({ route, navigation }) {
 				</View>
 			) : (
 				<View style={{ flex: 1 }}>
-					<ScrollView>
+					<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 						<View style={styles.statusContainer}>
 							<Text style={[ styles.heading, { padding: 10 } ]}>Order Status</Text>
 							<StepIndicator customStyles={customStyles} currentPosition={isStatus} labels={labels} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { Divider, ActivityIndicator } from 'react-native-paper';
 import Feather from 'react-native-vector-icons/Feather';
 import styles from './styles';
@@ -10,6 +10,8 @@ import moment from 'moment';
 function TodayOrders({ navigation }) {
 	const [ isLoader, setLoader ] = useState(false);
 	const [ isMyOrders, setMyOrders ] = useState([]);
+
+	const [ refreshing, setRefreshing ] = useState(false);
 
 	useEffect(() => {
 		const todayOrders = async () => {
@@ -29,6 +31,28 @@ function TodayOrders({ navigation }) {
 		};
 		todayOrders();
 	}, []);
+
+	const onRefresh = () => {
+		setRefreshing(true);
+		const todayOrders = async () => {
+			setLoader(true);
+			const user = await firestore().collection('MyOrders').get();
+			const data = user._docs.map((docs) => docs._data);
+
+			const currentDate = moment(new Date()).format('ll');
+
+			const dateByData = data.filter((d) => {
+				return d.orderDetails.bookingDate == currentDate;
+			});
+			console.log('refresh orders', dateByData);
+
+			setMyOrders(dateByData);
+			setRefreshing(false);
+			setLoader(false);
+		};
+		todayOrders();
+	};
+
 	return (
 		<View style={styles.container}>
 			<CustomHeader title="Orders" />
@@ -50,7 +74,7 @@ function TodayOrders({ navigation }) {
 				</View>
 			) : (
 				<View style={{ flex: 1 }}>
-					<ScrollView>
+					<ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 						<View>
 							<Text style={styles.today}>Today Orders : {isMyOrders.length}</Text>
 
