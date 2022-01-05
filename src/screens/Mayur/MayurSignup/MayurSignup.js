@@ -1,146 +1,185 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
-	View,
-	Text,
-	ImageBackground,
-	Image,
-	TouchableOpacity,
-	ScrollView,
-	KeyboardAvoidingView,
-	Dimensions
+  View,
+  Text,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Dimensions,
 } from 'react-native';
-import { TextInput } from 'react-native-paper';
-import { Button, Overlay } from 'react-native-elements';
+import {TextInput} from 'react-native-paper';
+import {Button, Overlay} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 import LottieView from 'lottie-react-native';
+import firestore from '@react-native-firebase/firestore';
 
 const ScreenHeight = Dimensions.get('window').height;
 const ScreenWidth = Dimensions.get('window').width;
 
-function MayurSignup({ navigation }) {
-	const [ isName, setIsName ] = useState('');
-	const [ isMobile, setIsMobile ] = useState('');
-	const [ isStoreName, setIsStoreName ] = useState('');
-	const [ isAddress, setIsAddress ] = useState('');
-	const [ isPassword, setIsPassword ] = useState('');
-	const [ visible, setVisible ] = useState(false);
+function MayurSignup({navigation}) {
+  const [isName, setIsName] = useState('');
+  const [isMobile, setIsMobile] = useState('');
+  const [isStoreName, setIsStoreName] = useState('');
+  const [isAddress, setIsAddress] = useState('');
+  const [isPassword, setIsPassword] = useState('');
+  const [visible, setVisible] = useState(false);
 
-	const theme = {
-		fonts: { regular: { fontFamily: 'JosefinSans-Medium' } },
-		colors: {
-			placeholder: '#000',
-			text: '#1A1915',
-			primary: '#1A1915',
-			underlineColor: 'transparent'
-		}
-	};
-	const registerSuccess = () => {
-		setVisible(true);
-		setTimeout(() => {
-			setVisible(false);
-			navigation.replace('MayurLogin');
-		}, 3000);
-	};
+  const theme = {
+    fonts: {regular: {fontFamily: 'JosefinSans-Medium'}},
+    colors: {
+      placeholder: '#000',
+      text: '#1A1915',
+      primary: '#1A1915',
+      underlineColor: 'transparent',
+    },
+  };
+  const registerSuccess = () => {
+    setVisible(true);
+    setTimeout(() => {
+      setVisible(false);
+      navigation.replace('MayurLogin');
+    }, 3000);
+  };
 
-	return (
-		<KeyboardAvoidingView behavior="height" enabled style={{ flex: 1 }}>
-			<ScrollView>
-				<ImageBackground source={require('../../../../assets/mayur/login_bg.jpg')} style={styles.backImage}>
-					<View style={styles.loginContainer}>
-						<ScrollView nestedScrollEnabled={true}>
-							<Text style={styles.logo}>Mayur tailors</Text>
+  const signupData = () => {
+    firestore()
+      .collection('mayurCredentials')
+      .doc('MAYUR')
+      .set({
+        ownerName: isName,
+        mobileNumber: isMobile,
+        storeName: isStoreName,
+        location: isAddress,
+        password: isPassword,
+      })
+      .then(() => {
+        console.log('credentials upload successfully');
+        registerSuccess();
+      })
+      .catch((err) => {
+        console.log('error' + err);
+      });
+  };
 
-							<Text style={styles.heading}>Create Account,</Text>
-							<Text style={styles.subHeading}>Signup to get started</Text>
-							<TextInput
-								mode="outlined"
-								label="Owner Name"
-								value={isName}
-								style={styles.inputStyle}
-								placeholderStyle={{ fontFamily: 'JosefinSans-Bold' }}
-								theme={theme}
-								selectionColor="#888"
-								onChangeText={(isName) => setIsName(isName)}
-							/>
-							<TextInput
-								mode="outlined"
-								label="Mobile Number"
-								value={isMobile}
-								style={styles.inputStyle}
-								keyboardType={'numeric'}
-								placeholderStyle={{ fontFamily: 'JosefinSans-Bold' }}
-								theme={theme}
-								selectionColor="#888"
-								onChangeText={(isMobile) => setIsMobile(isMobile)}
-							/>
-							<TextInput
-								mode="outlined"
-								label="Store Name"
-								value={isStoreName}
-								style={styles.inputStyle}
-								placeholderStyle={{ fontFamily: 'JosefinSans-Bold' }}
-								theme={theme}
-								selectionColor="#888"
-								onChangeText={(isStoreName) => setIsStoreName(isStoreName)}
-							/>
-							<TextInput
-								mode="outlined"
-								label="Store Location"
-								value={isAddress}
-								style={styles.inputStyle}
-								placeholderStyle={{ fontFamily: 'JosefinSans-Bold' }}
-								theme={theme}
-								selectionColor="#888"
-								onChangeText={(isAddress) => setIsAddress(isAddress)}
-							/>
-							<TextInput
-								mode="outlined"
-								label="Password"
-								value={isPassword}
-								style={styles.inputStyle}
-								placeholderStyle={{ fontFamily: 'JosefinSans-Bold' }}
-								theme={theme}
-								selectionColor="#888"
-								onChangeText={(isPassword) => setIsPassword(isPassword)}
-							/>
+  return (
+    <KeyboardAvoidingView behavior="height" enabled style={{flex: 1}}>
+      <ScrollView>
+        <ImageBackground
+          source={require('../../../../assets/mayur/login_bg.jpg')}
+          style={styles.backImage}>
+          <View style={styles.loginContainer}>
+            <ScrollView nestedScrollEnabled={true}>
+              <Text style={styles.logo}>Mayur tailors</Text>
 
-							<Button
-								title="Signup"
-								containerStyle={styles.buttonStyle}
-								buttonStyle={styles.buttonTitle}
-								titleStyle={{ fontFamily: 'JosefinSans-Medium' }}
-								onPress={() => registerSuccess()}
-							/>
-						</ScrollView>
-					</View>
-					<Overlay
-						isVisible={visible}
-						backdropStyle={{ backgroundColor: '#aaaaaa', opacity: 0.9 }}
-						overlayStyle={{ height: 170, width: 270, borderRadius: 15, padding: -1 }}
-					>
-						<View
-							style={{
-								height: 170,
-								backgroundColor: '#fff',
-								borderRadius: 15,
-								alignItems: 'center',
-								justifyContent: 'center'
-							}}
-						>
-							<LottieView
-								source={require('../../../../assets/success.json')}
-								style={{ height: 70, width: 70 }}
-								autoPlay
-								loop
-							/>
-							<Text style={[ styles.heading, { paddingLeft: 0 } ]}>Register Successful</Text>
-						</View>
-					</Overlay>
-				</ImageBackground>
-			</ScrollView>
-		</KeyboardAvoidingView>
-	);
+              <Text style={styles.heading}>Create Account,</Text>
+              <Text style={styles.subHeading}>Signup to get started</Text>
+              <TextInput
+                mode="outlined"
+                label="Owner Name"
+                value={isName}
+                style={styles.inputStyle}
+                placeholderStyle={{fontFamily: 'JosefinSans-Bold'}}
+                theme={theme}
+                selectionColor="#888"
+                onChangeText={(isName) => setIsName(isName)}
+              />
+              <TextInput
+                mode="outlined"
+                label="Mobile Number"
+                value={isMobile}
+                style={styles.inputStyle}
+                keyboardType={'numeric'}
+                placeholderStyle={{fontFamily: 'JosefinSans-Bold'}}
+                theme={theme}
+                selectionColor="#888"
+                onChangeText={(isMobile) => setIsMobile(isMobile)}
+              />
+              <TextInput
+                mode="outlined"
+                label="Store Name"
+                value={isStoreName}
+                style={styles.inputStyle}
+                placeholderStyle={{fontFamily: 'JosefinSans-Bold'}}
+                theme={theme}
+                selectionColor="#888"
+                onChangeText={(isStoreName) => setIsStoreName(isStoreName)}
+              />
+              <TextInput
+                mode="outlined"
+                label="Store Location"
+                value={isAddress}
+                style={styles.inputStyle}
+                placeholderStyle={{fontFamily: 'JosefinSans-Bold'}}
+                theme={theme}
+                selectionColor="#888"
+                onChangeText={(isAddress) => setIsAddress(isAddress)}
+              />
+              <TextInput
+                mode="outlined"
+                label="Password"
+                value={isPassword}
+                style={styles.inputStyle}
+                placeholderStyle={{fontFamily: 'JosefinSans-Bold'}}
+                theme={theme}
+                selectionColor="#888"
+                onChangeText={(isPassword) => setIsPassword(isPassword)}
+              />
+
+              <Button
+                title="Signup"
+                containerStyle={styles.buttonStyle}
+                disabled={
+                  !isName ||
+                  !isPassword ||
+                  !isMobile ||
+                  !isAddress ||
+                  !isStoreName
+                    ? true
+                    : false
+                }
+                buttonStyle={styles.buttonTitle}
+                titleStyle={{fontFamily: 'JosefinSans-Medium'}}
+                disabledStyle={{backgroundColor: '#BDBCBC'}}
+                disabledTitleStyle={{color: '#999'}}
+                onPress={() => signupData()}
+              />
+            </ScrollView>
+          </View>
+          <Overlay
+            isVisible={visible}
+            backdropStyle={{backgroundColor: '#aaaaaa', opacity: 0.9}}
+            overlayStyle={{
+              height: 170,
+              width: 270,
+              borderRadius: 15,
+              padding: -1,
+            }}>
+            <View
+              style={{
+                height: 170,
+                backgroundColor: '#fff',
+                borderRadius: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <LottieView
+                source={require('../../../../assets/success.json')}
+                style={{height: 70, width: 70}}
+                autoPlay
+                loop
+              />
+              <Text style={[styles.heading, {paddingLeft: 0}]}>
+                Register Successful
+              </Text>
+            </View>
+          </Overlay>
+        </ImageBackground>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
 }
 
 export default MayurSignup;

@@ -446,7 +446,7 @@ function CustomerDetails({ navigation, route }) {
 						title="Continue"
 						containerStyle={styles.buttonStyle}
 						buttonStyle={styles.buttonTitle}
-						disabled={!isCustId || !isCustName || !isCustMobile || !isCity ? true : false}
+						disabled={!isCustId || !isCustName || !isCustMobile || !isCity || !isAdvance || !checked || !photocam ? true : false}
 						titleStyle={{ fontFamily: 'JosefinSans-Medium' }}
 						onPress={() => {
 							openPanel();

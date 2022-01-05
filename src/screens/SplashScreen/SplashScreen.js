@@ -45,7 +45,7 @@ function SplashScreen({ navigation }) {
 	const closeIndicator = () => {
 		setTimeout(() => {
 			setIsAnimating(true);
-		}, 2000);
+		}, 3000);
 	};
 	useEffect(() => {
 		const callScreen = () => {

@@ -14,7 +14,7 @@ import styles from './styles';
 import CustomHeader from '../../../components/CustomHeader';
 const ScreenWidth = Dimensions.get('window').width;
 
-const labels = [ 'PLACED', 'CUTTING', 'STICHING', 'READY', 'DELIVERY' ];
+const labels = [ 'PLACED', 'CUTTING', 'STICHING', 'READY', 'DELIVERIED' ];
 const customStyles = {
 	stepIndicatorSize: 25,
 	currentStepIndicatorSize: 30,
@@ -58,7 +58,7 @@ const statusNames = [
 		id: 4
 	},
 	{
-		name: 'DELIVERY',
+		name: 'DELIVERIED',
 		id: 5
 	}
 ];
@@ -111,7 +111,7 @@ function MyOrderDetails({ route }) {
 				setStatusPos(3);
 			} else if (status == 'READY') {
 				setStatusPos(4);
-			} else if (status == 'DELIVERY') {
+			} else if (status == 'DELIVERIED') {
 				setStatusPos(5);
 			}
 		};
@@ -156,7 +156,7 @@ function MyOrderDetails({ route }) {
 		} else if (statusName == 'READY') {
 			setStatusPos(4);
 			toggleStatusOverlay();
-		} else if (statusName == 'DELIVERY') {
+		} else if (statusName == 'DELIVERIED') {
 			setStatusPos(5);
 			toggleStatusOverlay();
 		}
