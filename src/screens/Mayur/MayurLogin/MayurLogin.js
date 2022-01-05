@@ -104,7 +104,7 @@ function MayurLogin({navigation}) {
             />
             <TouchableOpacity
               onPress={() => navigation.navigate('MayurMobileNumber')}>
-              <Text style={styles.semiHeading}>Forgot Password ?</Text>
+              <Text style={styles.semiHeading}>Forgot Password </Text>
             </TouchableOpacity>
             <Button
               title="Login"
